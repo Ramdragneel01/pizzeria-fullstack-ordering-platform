@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pizzeria Ordering Platform</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <section class="card">
+        <h1>Pizzeria Ordering Platform</h1>
+        <p>Create custom orders with live inventory checks and status tracking.</p>
+
+        <form id="order-form">
+          <label>
+            Customer Name
+            <input id="customer-name" required />
+          </label>
+
+          <label>
+            Size
+            <select id="size">
+              <option value="small">Small</option>
+              <option value="medium" selected>Medium</option>
+              <option value="large">Large</option>
+            </select>
+          </label>
+
+          <label>
+            Crust
+            <select id="crust">
+              <option value="classic">Classic</option>
+              <option value="thin">Thin</option>
+              <option value="cheese_burst">Cheese Burst</option>
+            </select>
+          </label>
+
+          <label>
+            Toppings (comma separated)
+            <input id="toppings" placeholder="onion,mushroom,olives" />
+          </label>
+
+          <label>
+            Payment Method
+            <select id="payment-method">
+              <option value="card">Card</option>
+              <option value="upi">UPI</option>
+              <option value="wallet">Wallet</option>
+              <option value="cash">Cash</option>
+            </select>
+          </label>
+
+          <button type="submit">Place Order</button>
+        </form>
+
+        <p id="flash" aria-live="polite"></p>
+      </section>
+
+      <section class="card">
+        <div class="row">
+          <h2>Orders</h2>
+          <button id="refresh-orders" type="button">Refresh</button>
+        </div>
+        <ul id="orders-list"></ul>
+      </section>
+    </main>
+
+    <script src="app.js" type="module"></script>
+  </body>
+</html>
