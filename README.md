@@ -64,11 +64,11 @@ When a valid order is posted, API returns `201` with generated `id`, `status: "p
 ## Limitations
 
 1. Uses in-memory state only; no persistent database.
-2. No authentication/authorization in current MVP APIs.
+2. Supports API key auth and in-memory throttling for write routes, but no identity-provider integration or role-based access control.
 3. Payment processing is simulated and non-PCI production ready.
 
 ## Next Roadmap
 
 1. Add database persistence and idempotent order creation.
-2. Add authN/authZ and rate limiting for API routes.
+2. Integrate managed authN/authZ with scoped permissions.
 3. Add containerized deployment and structured metrics export.

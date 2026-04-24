@@ -21,6 +21,9 @@ Use `.env.example` as a baseline:
 
 1. `PORT`
 2. `CORS_ORIGIN`
+3. `API_KEY` (optional; enables write-endpoint API key auth)
+4. `RATE_LIMIT_MAX` (max write requests per client per window)
+5. `RATE_LIMIT_WINDOW_MS` (write-rate limit window size in milliseconds)
 
 ## CI and Release
 
