@@ -3,16 +3,34 @@ name: CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
+    branches: [main]
 
 permissions:
   contents: read
 
+concurrency:
+  group: pizzeria-fullstack-ordering-platform-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Dependency review
+        uses: actions/dependency-review-action@v4
+
   build-test:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
@@ -23,6 +41,7 @@ jobs:
         with:
           node-version: "20"
           cache: "npm"
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -34,7 +53,7 @@ jobs:
         run: npm test
 
       - name: Run dependency audit
-        run: npm audit --omit=dev
+        run: npm audit --omit=dev --audit-level=high
 
       - name: API smoke check
         run: |
