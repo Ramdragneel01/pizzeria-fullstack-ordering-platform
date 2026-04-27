@@ -49,8 +49,10 @@ jobs:
       - name: Run lint checks
         run: npm run lint
 
-      - name: Run tests
-        run: npm test
+      - name: Run tests with coverage gate
+        run: |
+          npm install --no-save c8
+          npx c8 --reporter=text-summary --check-coverage --lines 50 --functions 50 --branches 40 npm test
 
       - name: Run dependency audit
         run: npm audit --omit=dev --audit-level=high
