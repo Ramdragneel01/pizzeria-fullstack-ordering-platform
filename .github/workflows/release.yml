@@ -42,7 +42,8 @@ jobs:
         run: npm audit --omit=dev --audit-level=high
 
       - name: Package release archive
-        run: tar -czf pizzeria-fullstack-ordering-platform-${{ github.ref_name }}.tgz --exclude=node_modules --exclude=.git .
+        run: tar -czf pizzeria-fullstack-ordering-platform-${{ github.ref_name }}.tgz
+          --exclude=node_modules --exclude=.git .
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
