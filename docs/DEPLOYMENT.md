@@ -15,6 +15,14 @@ Health check:
 curl http://127.0.0.1:8080/health
 ```
 
+Readiness and alias checks:
+
+```bash
+curl http://127.0.0.1:8080/ready
+curl http://127.0.0.1:8080/healthz
+curl http://127.0.0.1:8080/readyz
+```
+
 ## Environment Variables
 
 Use `.env.example` as a baseline:

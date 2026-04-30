@@ -2,6 +2,13 @@
 
 Base URL (local): `http://127.0.0.1:8080`
 
+## Health and Readiness
+
+1. `GET /health`
+2. `GET /ready`
+3. `GET /healthz` (alias for `/health`)
+4. `GET /readyz` (alias for `/ready`)
+
 ## GET /health
 
 Returns service heartbeat and current in-memory order count.
@@ -43,8 +50,8 @@ Possible responses:
 2. `409`: inventory unavailable.
 3. `422`: missing or invalid required fields.
 4. `402`: payment rejected.
-5. `401`: missing/invalid API key when auth is enabled.
-6. `429`: write request rate limit exceeded.
+5. `401`: missing/invalid API key when auth is enabled (`api_key_invalid`).
+6. `429`: write request rate limit exceeded (`rate_limited`) with `Retry-After: 60`.
 
 ## PATCH /api/orders/:id/status
 
@@ -68,5 +75,29 @@ Possible responses:
 1. `200`: transition applied.
 2. `404`: order not found.
 3. `422`: invalid transition.
-4. `401`: missing/invalid API key when auth is enabled.
-5. `429`: write request rate limit exceeded.
+4. `401`: missing/invalid API key when auth is enabled (`api_key_invalid`).
+5. `429`: write request rate limit exceeded (`rate_limited`) with `Retry-After: 60`.
+
+## Error Contract
+
+All API errors return a normalized payload:
+
+```json
+{
+  "error": {
+    "code": "string",
+    "message": "string",
+    "request_id": "string",
+    "details": {}
+  }
+}
+```
+
+Common error codes:
+
+1. `unauthorized`
+2. `validation_error`
+3. `payment_required`
+4. `conflict`
+5. `not_found`
+6. `rate_limited`
