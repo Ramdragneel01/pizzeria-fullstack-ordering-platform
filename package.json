@@ -7,7 +7,7 @@
     "start": "node server/index.js",
     "dev": "node --watch server/index.js",
     "test": "node --test server/tests/*.test.js",
-    "lint": "node --check server/index.js && node --check server/services/orders.js && node --check server/services/inventory.js && node --check server/services/payment.js && node --check frontend/app.js && node --check server/tests/api.test.js && node --check server/tests/status-transition.test.js"
+    "lint": "node --check server/index.js && node --check server/services/orders.js && node --check server/services/inventory.js && node --check server/services/payment.js && node --check frontend/app.js && node --check server/tests/api.test.js && node --check server/tests/lifecycle-api.test.js && node --check server/tests/status-transition.test.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
