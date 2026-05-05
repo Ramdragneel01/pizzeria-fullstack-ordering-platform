@@ -265,3 +265,64 @@ test("error responses include request and security headers", async () => {
     assert.equal(response.headers["x-frame-options"], "DENY");
   });
 });
+
+test("returns normalized not-found contract for unknown routes", async () => {
+  resetAppState();
+
+  const response = await request(app).get("/api/does-not-exist");
+  assertErrorContract(response, {
+    status: 404,
+    code: "not_found",
+    message: "route_not_found",
+  });
+});
+
+test("rejects status transition with unknown status value", async () => {
+  resetAppState();
+
+  const createResponse = await request(app).post("/api/orders").send(buildOrderPayload());
+  const orderId = createResponse.body.id;
+
+  const invalidTransition = await request(app)
+    .patch(`/api/orders/${orderId}/status`)
+    .send({ status: "packed" });
+
+  assertErrorContract(invalidTransition, {
+    status: 422,
+    code: "validation_error",
+    message: "invalid_status_transition",
+  });
+});
+
+test("rejects order when payment method is unsupported", async () => {
+  resetAppState();
+
+  const response = await request(app)
+    .post("/api/orders")
+    .send(buildOrderPayload({ paymentMethod: "bank_transfer" }));
+
+  assertErrorContract(response, {
+    status: 402,
+    code: "payment_required",
+    message: "payment_rejected",
+  });
+});
+
+test("returns inventory conflict when requested toppings exceed stock", async () => {
+  resetAppState();
+
+  const heavyPepperoniPayload = buildOrderPayload({
+    toppings: Array.from({ length: 30 }, () => "pepperoni"),
+  });
+
+  const response = await request(app).post("/api/orders").send(heavyPepperoniPayload);
+
+  assertErrorContract(response, {
+    status: 409,
+    code: "conflict",
+    message: "inventory_unavailable",
+    details: true,
+  });
+  assert.equal(Array.isArray(response.body.error.details.missing), true);
+  assert.equal(response.body.error.details.missing.includes("pepperoni"), true);
+});
