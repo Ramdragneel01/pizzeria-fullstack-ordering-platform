@@ -17,11 +17,23 @@ This endpoint remains public.
 
 ## GET /api/menu
 
-Returns pizza menu and current inventory snapshot.
+Returns consolidated menu metadata with full pizza and topping catalog plus current inventory snapshot.
+
+## GET /api/pizzas
+
+Returns normalized pizza catalog used by the UI.
+
+## GET /api/toppings
+
+Returns available toppings catalog.
 
 ## GET /api/orders
 
 Returns all current orders in memory.
+
+## GET /api/orders/:id
+
+Returns one order by id.
 
 ## POST /api/orders
 
@@ -32,7 +44,7 @@ Security behavior:
 1. Requires `X-API-Key` header when `API_KEY` is configured.
 2. Subject to write-request throttling via `RATE_LIMIT_MAX` and `RATE_LIMIT_WINDOW_MS`.
 
-Request body example:
+Legacy request body example:
 
 ```json
 {
@@ -40,6 +52,26 @@ Request body example:
   "size": "medium",
   "crust": "thin",
   "toppings": ["basil", "olives"],
+  "paymentMethod": "card"
+}
+```
+
+Cart-style request body example:
+
+```json
+{
+  "customer": {
+    "name": "Cart User",
+    "phone": "9999999999",
+    "address": "Main Street 12"
+  },
+  "items": [
+    {
+      "pizzaId": "0001",
+      "quantity": 2
+    }
+  ],
+  "notes": "No onion",
   "paymentMethod": "card"
 }
 ```
@@ -69,6 +101,8 @@ Request body example:
   "status": "preparing"
 }
 ```
+
+If body is empty, status advances to the next lifecycle stage automatically.
 
 Possible responses:
 

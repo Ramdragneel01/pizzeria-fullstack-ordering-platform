@@ -9,6 +9,7 @@ test("allows forward lifecycle transitions", () => {
   assert.equal(canTransitionStatus("preparing", "baking"), true);
   assert.equal(canTransitionStatus("baking", "out_for_delivery"), true);
   assert.equal(canTransitionStatus("out_for_delivery", "delivered"), true);
+  assert.equal(canTransitionStatus("baking", "cancelled"), true);
 });
 
 test("rejects unknown statuses", () => {
@@ -19,4 +20,5 @@ test("rejects unknown statuses", () => {
 test("rejects transitions from terminal states", () => {
   assert.equal(canTransitionStatus("cancelled", "preparing"), false);
   assert.equal(canTransitionStatus("delivered", "placed"), false);
+  assert.equal(canTransitionStatus("placed", "placed"), false);
 });

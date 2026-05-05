@@ -1,14 +1,15 @@
 # pizzeria-fullstack-ordering-platform
 
-Production-focused full-stack pizza ordering repository with modular backend services for inventory checks, pricing, and status lifecycle handling.
+Production-focused full-stack pizza ordering platform with a modern Pizzaria-branded UI, order lifecycle APIs, and inventory-aware backend services.
 
-## Implemented Scope
+## What Is Merged
 
-1. Express API with isolated service modules (`inventory`, `orders`, `payment`).
-2. Dynamic total calculation based on pizza size and topping count.
-3. Inventory-aware order creation and status transition validation.
-4. Lightweight frontend client for order placement and list refresh.
-5. Testable in-memory state model with reset hooks for deterministic API tests.
+1. Pizzaria catalog and branding assets integrated into this repository.
+2. Rich, responsive ordering UI with search/filter menu explorer, cart, checkout, and timeline tracker.
+3. Backend API extended to support both payload styles:
+4. Legacy contract (`customerName`, `size`, `crust`, `toppings`, `paymentMethod`).
+5. Cart contract (`customer`, `items`, `notes`, `paymentMethod`) used by the new UI.
+6. Preserved production controls: request IDs, security headers, API-key protection, write-route throttling, and normalized error contract.
 
 ## Quick Start
 
@@ -17,9 +18,9 @@ npm install
 npm run start
 ```
 
-Open `http://127.0.0.1:8080`.
+Open: `http://127.0.0.1:8080`
 
-## Quality Gate (Local CI Equivalent)
+## Local Quality Gate
 
 ```bash
 npm ci
@@ -27,48 +28,58 @@ npm run lint
 npm test
 ```
 
-## Endpoints
+## Environment
 
-1. GET `/health`
-2. GET `/api/menu`
-3. GET `/api/orders`
-4. POST `/api/orders`
-5. PATCH `/api/orders/:id/status`
+Use `.env.example` as a baseline:
 
-Additional endpoint details are in `docs/API.md`.
+1. `PORT` service port
+2. `CORS_ORIGIN` comma-separated allowed origins
+3. `API_KEY` optional key required for write routes
+4. `RATE_LIMIT_MAX` max write requests per time window
+5. `RATE_LIMIT_WINDOW_MS` write-route rate-limit window
+
+## API Overview
+
+1. `GET /health`
+2. `GET /ready`
+3. `GET /healthz`
+4. `GET /readyz`
+5. `GET /api/menu`
+6. `GET /api/pizzas`
+7. `GET /api/toppings`
+8. `GET /api/orders`
+9. `GET /api/orders/:id`
+10. `POST /api/orders`
+11. `PATCH /api/orders/:id/status`
+
+Full request/response examples are in `docs/API.md`.
 
 ## Smoke Commands
 
 ```bash
 curl http://127.0.0.1:8080/health
-curl -X GET http://127.0.0.1:8080/api/menu
+curl http://127.0.0.1:8080/api/pizzas
 curl -X POST http://127.0.0.1:8080/api/orders \
-	-H "Content-Type: application/json" \
-	-d '{"customerName":"Demo User","size":"medium","crust":"thin","toppings":["basil"],"paymentMethod":"card"}'
+  -H "Content-Type: application/json" \
+  -d '{"customerName":"Demo User","size":"medium","crust":"thin","toppings":["basil","olives"],"paymentMethod":"card"}'
 ```
 
-## Demo Evidence
+Cart-style payload smoke example:
 
-Expected health response:
-
-```json
-{
-	"status": "ok",
-	"service": "pizzeria-fullstack-ordering-platform",
-	"totalOrders": 0
-}
+```bash
+curl -X POST http://127.0.0.1:8080/api/orders \
+  -H "Content-Type: application/json" \
+  -d '{"customer":{"name":"Demo","phone":"9999999999","address":"Main St"},"items":[{"pizzaId":"0001","quantity":1}],"notes":"No onion","paymentMethod":"card"}'
 ```
-
-When a valid order is posted, API returns `201` with generated `id`, `status: "placed"`, `payment`, and `createdAt`.
 
 ## Limitations
 
-1. Uses in-memory state only; no persistent database.
-2. Supports API key auth and in-memory throttling for write routes, but no identity-provider integration or role-based access control.
-3. Payment processing is simulated and non-PCI production ready.
+1. In-memory state only; order and inventory data reset on restart.
+2. Payment processing is simulated and not PCI production ready.
+3. No persistent authentication or role-based authorization model yet.
 
-## Next Roadmap
+## Roadmap
 
-1. Add database persistence and idempotent order creation.
-2. Integrate managed authN/authZ with scoped permissions.
-3. Add containerized deployment and structured metrics export.
+1. Add durable persistence and idempotent order creation.
+2. Add observability signals (metrics, traces, structured logs).
+3. Add real payment gateway adapter and order event webhooks.

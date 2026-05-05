@@ -91,6 +91,56 @@ test("creates an order and returns it in order list", async () => {
   assert.equal(listResponse.body.items.length, 1);
 });
 
+test("exposes Pizzaria catalog endpoints", async () => {
+  resetAppState();
+
+  const pizzasResponse = await request(app).get("/api/pizzas");
+  assert.equal(pizzasResponse.status, 200);
+  assert.equal(Array.isArray(pizzasResponse.body.pizzas), true);
+  assert.ok(pizzasResponse.body.pizzas.length > 0);
+
+  const toppingsResponse = await request(app).get("/api/toppings");
+  assert.equal(toppingsResponse.status, 200);
+  assert.equal(Array.isArray(toppingsResponse.body.toppings), true);
+  assert.ok(toppingsResponse.body.toppings.length > 0);
+});
+
+test("creates and fetches a cart-style order payload", async () => {
+  resetAppState();
+
+  const menuResponse = await request(app).get("/api/pizzas");
+  const firstPizza = menuResponse.body.pizzas[0];
+
+  const createResponse = await request(app)
+    .post("/api/orders")
+    .send({
+      customer: {
+        name: "Cart User",
+        phone: "9999999999",
+        address: "Main Street 12",
+      },
+      notes: "No onions",
+      paymentMethod: "card",
+      items: [
+        {
+          pizzaId: firstPizza.id,
+          quantity: 2,
+        },
+      ],
+    });
+
+  assert.equal(createResponse.status, 201);
+  assert.equal(createResponse.body.status, "placed");
+  assert.equal(createResponse.body.customer.name, "Cart User");
+  assert.equal(Array.isArray(createResponse.body.items), true);
+  assert.equal(createResponse.body.items.length, 1);
+  assert.ok(createResponse.body.pricing.total > 0);
+
+  const getOrderResponse = await request(app).get(`/api/orders/${createResponse.body.id}`);
+  assert.equal(getOrderResponse.status, 200);
+  assert.equal(getOrderResponse.body.order.id, createResponse.body.id);
+});
+
 test("exposes readiness and probe alias endpoints", async () => {
   resetAppState();
 
@@ -131,6 +181,20 @@ test("updates status when transition is valid", async () => {
   const patchResponse = await request(app)
     .patch(`/api/orders/${orderId}/status`)
     .send({ status: "preparing" });
+
+  assert.equal(patchResponse.status, 200);
+  assert.equal(patchResponse.body.status, "preparing");
+});
+
+test("auto-advances status when patch payload is empty", async () => {
+  resetAppState();
+
+  const createResponse = await request(app).post("/api/orders").send(buildOrderPayload());
+  const orderId = createResponse.body.id;
+
+  const patchResponse = await request(app)
+    .patch(`/api/orders/${orderId}/status`)
+    .send({});
 
   assert.equal(patchResponse.status, 200);
   assert.equal(patchResponse.body.status, "preparing");

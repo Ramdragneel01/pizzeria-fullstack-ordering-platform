@@ -15,8 +15,10 @@ npm test
 Current coverage areas:
 
 1. API create/list/update flows.
-2. Input validation and error path assertions.
-3. Status transition rule behavior.
+2. Catalog endpoint coverage (`/api/pizzas`, `/api/toppings`).
+3. Input validation and error path assertions.
+4. Legacy and cart-style order payload compatibility.
+5. Status transition rule behavior.
 
 ## CI Notes
 

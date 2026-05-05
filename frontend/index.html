@@ -1,71 +1,172 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pizzeria Ordering Platform</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <main class="layout">
-      <section class="card">
-        <h1>Pizzeria Ordering Platform</h1>
-        <p>Create custom orders with live inventory checks and status tracking.</p>
 
-        <form id="order-form">
-          <label>
-            Customer Name
-            <input id="customer-name" required />
-          </label>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="Pizzaria full-stack ordering platform with rich menu browsing, smart carting, and order lifecycle tracking." />
+  <title>Pizzaria Fullstack Ordering Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;700;800&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
 
-          <label>
-            Size
-            <select id="size">
-              <option value="small">Small</option>
-              <option value="medium" selected>Medium</option>
-              <option value="large">Large</option>
-            </select>
-          </label>
+<body>
+  <div class="bg-glow bg-glow-one" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow-two" aria-hidden="true"></div>
 
-          <label>
-            Crust
-            <select id="crust">
-              <option value="classic">Classic</option>
-              <option value="thin">Thin</option>
-              <option value="cheese_burst">Cheese Burst</option>
-            </select>
-          </label>
+  <main class="app-shell">
+    <header class="hero">
+      <section class="hero-copy">
+        <p class="eyebrow">Pizzeria Fullstack Ordering Platform</p>
+        <h1>Craft your slice. Track every step.</h1>
+        <p>
+          A modern ordering experience with rich menu browsing, clean checkout flow, and real-time
+          lifecycle visibility from placed to delivered.
+        </p>
 
-          <label>
-            Toppings (comma separated)
-            <input id="toppings" placeholder="onion,mushroom,olives" />
-          </label>
-
-          <label>
-            Payment Method
-            <select id="payment-method">
-              <option value="card">Card</option>
-              <option value="upi">UPI</option>
-              <option value="wallet">Wallet</option>
-              <option value="cash">Cash</option>
-            </select>
-          </label>
-
-          <button type="submit">Place Order</button>
-        </form>
-
-        <p id="flash" aria-live="polite"></p>
-      </section>
-
-      <section class="card">
-        <div class="row">
-          <h2>Orders</h2>
-          <button id="refresh-orders" type="button">Refresh</button>
+        <div class="hero-actions">
+          <button class="btn btn-primary" id="start-ordering" type="button">Start Ordering</button>
+          <button class="btn btn-ghost" id="hero-refresh-tracking" type="button" disabled>
+            Refresh Timeline
+          </button>
         </div>
-        <ul id="orders-list"></ul>
-      </section>
-    </main>
 
-    <script src="app.js" type="module"></script>
-  </body>
+        <div class="hero-metrics">
+          <div>
+            <strong id="metric-pizzas">--</strong>
+            <span>Signature Pizzas</span>
+          </div>
+          <div>
+            <strong id="metric-toppings">--</strong>
+            <span>Premium Toppings</span>
+          </div>
+          <div>
+            <strong>30 min</strong>
+            <span>Average Dispatch</span>
+          </div>
+        </div>
+      </section>
+
+      <aside class="hero-card">
+        <img src="pizzeria-logo.png" alt="Pizzaria logo" class="brand-logo" />
+        <p>Handcrafted pizzas, faster checkouts, and trackable orders.</p>
+        <span class="chip">Lifecycle API enabled</span>
+      </aside>
+    </header>
+
+    <p id="status-banner" class="status-banner hidden" aria-live="polite"></p>
+
+    <section class="content-grid">
+      <section class="menu-panel" id="menu-section">
+        <div class="panel-header">
+          <div>
+            <h2>Menu Explorer</h2>
+            <p>Search by flavor profile, filter by type, and build your cart instantly.</p>
+          </div>
+        </div>
+
+        <div class="controls-row">
+          <input type="search" id="search-input" placeholder="Search paneer, mushroom, spicy, smoky..."
+            aria-label="Search pizzas" />
+
+          <div class="filter-chips" role="tablist" aria-label="Pizza filters">
+            <button class="chip-btn active" type="button" data-filter="all">All</button>
+            <button class="chip-btn" type="button" data-filter="veg">Veg</button>
+            <button class="chip-btn" type="button" data-filter="nonveg">Non Veg</button>
+          </div>
+        </div>
+
+        <div id="menu-state" class="state-message hidden"></div>
+        <div id="menu-grid" class="menu-grid"></div>
+      </section>
+
+      <aside class="summary-panel">
+        <section class="summary-card">
+          <div class="summary-head">
+            <h3>Current Cart</h3>
+            <span id="item-count">0 items</span>
+          </div>
+
+          <ul id="cart-list" class="cart-list"></ul>
+          <p id="cart-empty" class="empty-state">Pick a pizza to start your order.</p>
+
+          <div class="price-lines">
+            <div>
+              <span>Subtotal</span>
+              <span id="subtotal-value">₹0</span>
+            </div>
+            <div>
+              <span>Tax (5%)</span>
+              <span id="tax-value">₹0</span>
+            </div>
+            <div>
+              <span>Delivery</span>
+              <span id="delivery-value">₹0</span>
+            </div>
+            <div class="price-total">
+              <span>Total</span>
+              <span id="total-value">₹0</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="checkout-card">
+          <h3>Delivery Details</h3>
+          <form id="checkout-form">
+            <label>
+              Name
+              <input id="customer-name" type="text" placeholder="Enter your name" required />
+            </label>
+            <label>
+              Phone
+              <input id="customer-phone" type="tel" placeholder="Enter contact number" required />
+            </label>
+            <label>
+              Address
+              <textarea id="customer-address" rows="3" placeholder="Flat / building / street / area"
+                required></textarea>
+            </label>
+            <label>
+              Notes
+              <textarea id="order-notes" rows="2" placeholder="Extra cheese, no onion, ring bell..."></textarea>
+            </label>
+
+            <button type="submit" class="btn btn-primary place-order" id="place-order-btn">
+              Place Order
+            </button>
+          </form>
+        </section>
+
+        <section class="tracking-card hidden" id="tracking-card">
+          <div class="tracking-head">
+            <h3>Order Timeline</h3>
+            <span id="tracking-order-id">--</span>
+          </div>
+
+          <p class="tracking-status" id="tracking-current-status">Current status: --</p>
+
+          <div class="timeline" id="tracking-timeline"></div>
+          <p class="timeline-note" id="tracking-last-update"></p>
+
+          <div class="hero-actions">
+            <button type="button" class="btn btn-primary" id="advance-status-btn">Advance Status</button>
+            <button type="button" class="btn btn-ghost" id="refresh-status-btn">Refresh</button>
+          </div>
+        </section>
+
+        <section class="toppings-card">
+          <h3>Popular Add-ons</h3>
+          <div id="toppings-grid" class="topping-list"></div>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <script src="app.js" type="module"></script>
+</body>
+
 </html>
